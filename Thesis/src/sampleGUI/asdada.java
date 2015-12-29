@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JList;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.JButton;
 
 public class asdada extends JFrame {
 
@@ -36,11 +38,24 @@ public class asdada extends JFrame {
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		contentPane.setLayout(new MigLayout("", "[grow]", "[][][][grow][][][][]"));
+		
+		JButton btnNewButton = new JButton("New button");
+		contentPane.add(btnNewButton, "flowx,cell 0 0");
+		
+		JButton btnNewButton_1 = new JButton("New button");
+		contentPane.add(btnNewButton_1, "cell 0 0");
 		
 		JList list = new JList();
-		contentPane.add(list, BorderLayout.CENTER);
+		contentPane.add(list, "cell 0 3,grow");
+		
+		JButton btnNewButton_2 = new JButton("New button");
+		contentPane.add(btnNewButton_2, "flowx,cell 0 7");
+		
+		JButton btnNewButton_3 = new JButton("New button");
+		contentPane.add(btnNewButton_3, "cell 0 7");
+
 	}
 
 }
