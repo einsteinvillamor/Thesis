@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class WekaLauncher {
 	private List<String> emotionList = new ArrayList<>();
 	private String modelpath = "";//"C:/Users/Eihwaz/Downloads/KNN.model";
 	private Classifier cls;
-	
+	Path currentRelativePath = Paths.get("");
 //	public WekaLauncher() throws Exception{
 //		cls =(Classifier) weka.core.SerializationHelper.read(modelpath.replaceAll("\\\\", "/"));
 //	}
@@ -52,11 +54,12 @@ public class WekaLauncher {
 			double clsLabel = cls.classifyInstance(test.instance(i));
 			labeled.instance(i).setClassValue(clsLabel);
 		}
-		
-		BufferedWriter bw = new BufferedWriter(new FileWriter("C:/Users/Eihwaz/Desktop/PredictedEmotion/"+filename));
+		filepath = currentRelativePath.toAbsolutePath().toString() +"/Files/FinalResult/"+filename;
+		BufferedWriter bw = new BufferedWriter(new FileWriter(filepath));
+		//"C:/Users/Eihwaz/Desktop/PredictedEmotion/"+filename));
 		bw.write(labeled.toString());
 		bw.close();
-		filepath = "C:/Users/Eihwaz/Desktop/PredictedEmotion/"+filename;
+		
 		emotionList = lastLineReader(filepath);
 		System.out.println(labeled.toString());
 		System.out.println(etest.toSummaryString());

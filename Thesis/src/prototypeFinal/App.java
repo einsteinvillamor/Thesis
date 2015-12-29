@@ -8,6 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
@@ -23,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
@@ -42,6 +46,8 @@ public class App extends JFrame {
 	private CsvToArff ctoa;
 	private ArffWriter arff;
 	JLabel lblLastRecordedEmotion = new JLabel("Last Recorded Emotion: ");
+	
+	String[] column = {"Time Length", "Agent Assessment", "Detected Emotion"};
 	
 	public static boolean isLabelSet = false;
 	public static boolean isModelSet = false;
@@ -181,7 +187,7 @@ public class App extends JFrame {
 					JOptionPane.showMessageDialog(null, "Set model and label first");
 			}
 		});
-		String[] column = {"Time Length", "Agent Assessment", "Detected Emotion"};
+		
 		Object[][] data = {};
 		table = new JTable(data,column);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
@@ -239,6 +245,27 @@ public class App extends JFrame {
 		});
 		contentPane.add(btnTest, "cell 0 0");
 	}
+	
+	void populateTable(){
+		List<String> asd = new ArrayList<>();
+		TableModel dtm = new DefaultTableModel(asd.toArray(new Object[][] {}), column);
+		for(int i = 0 ; i < emoDialog.getEmotionList().size();i++){
+			asd.add("Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Prediction: "+weka.getEmotionList().get(i+2));
+			System.out.println(asd.get(i));
+		}
+
+//		for(int i = 0; i < asd.size(); i++){
+//			System.out.println("hello");
+//			dtm.addElement(asd.get(i));
+//		}
+		table.setModel(dtm);
+		
+		//label.setText(weka.getAcc().get(1));
+		//label_1.setText(weka.getAcc().get(2));
+		for(String i: weka.getAcc()){
+			System.out.println(i);
+		}
+	}
 
 	void swingController(){
 		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
@@ -284,4 +311,5 @@ public class App extends JFrame {
 		worker.execute();
 	}
 
+	
 }
