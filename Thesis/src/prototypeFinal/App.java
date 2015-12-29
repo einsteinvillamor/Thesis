@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
@@ -38,10 +39,13 @@ public class App extends JFrame {
 	private EmotionDialog emoDialog;
 	private MatlabLauncher matlab;
 	private CsvFileWriter cfw;
+	private CsvToArff ctoa;
+	private ArffWriter arff;
 	JLabel lblLastRecordedEmotion = new JLabel("Last Recorded Emotion: ");
 	
 	public static boolean isLabelSet = false;
 	public static boolean isModelSet = false;
+	//public static volatile boolean isMatlabRunning = false;
 	
 	Path currentRelativePath = Paths.get("");
 	/**
@@ -51,6 +55,11 @@ public class App extends JFrame {
 	public static enum guiState{
 		Record, Stop
 	}
+	
+	public static enum matlabState{
+		Running, Stopped
+	}
+	public static volatile matlabState matlabStat = matlabState.Stopped;
 	public static volatile guiState guiStat = guiState.Stop;
 	
 	public static void main(String[] args) {
@@ -77,6 +86,14 @@ public class App extends JFrame {
 		lblDialog = new LabelDialog();
 		matlab = new MatlabLauncher(false);
 		cfw = new CsvFileWriter();
+		ctoa = new CsvToArff();
+		arff = new ArffWriter();
+		arff.setAttList("hfd");
+		arff.setAttList("katz");
+		arff.setAttList("hurst");
+		arff.setAttList("box");
+		arff.setAttList("dfa");
+		weka = new WekaLauncher();
 		String s = currentRelativePath.toAbsolutePath().toString() +"/Files";
 		String s1 = currentRelativePath.toAbsolutePath().toString() +"/PermanentFiles";
 		File theDir = new File(s.replaceAll("\\\\", "/"));
@@ -117,7 +134,7 @@ public class App extends JFrame {
 			System.out.println("DIR exists");
 		
 		
-		weka = new WekaLauncher();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -158,7 +175,8 @@ public class App extends JFrame {
 					btnSetLabel.setEnabled(false);
 					emoDialog.setLblRecord(lblLastRecordedEmotion);
 					//guiStat.notifyAll();
-					SwingController();
+
+					swingController();
 				}else
 					JOptionPane.showMessageDialog(null, "Set model and label first");
 			}
@@ -174,7 +192,7 @@ public class App extends JFrame {
 		
 		contentPane.add(lblLastRecordedEmotion, "cell 0 2");
 		contentPane.add(btnRecord, "flowx,cell 0 3");
-		
+			
 		JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -182,7 +200,31 @@ public class App extends JFrame {
 				guiStat = guiState.Stop;
 				btnLoadModel.setEnabled(true);
 				btnSetLabel.setEnabled(true);
+				while(matlabStat == matlabState.Running){
+					btnStop.setText("Processing");
+				}
+//				try {
+//					Thread.sleep(3000);
+//				} catch (InterruptedException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 				cfw.setValuesList(matlab.getResultList());
+				cfw.setEmotionList(emoDialog.getEmotionList());
+				cfw.writeCsvFile();
+				try {
+					ctoa.csvToArff(cfw.getFilename(), cfw.getPath());
+					arff.setNominalLabelList(LabelDialog.labelList);
+					arff.addAttributeArff(ctoa.getPathwName());
+					cfw.reader(arff.getFilepath());
+					weka.setFilepath(currentRelativePath.toAbsolutePath().toString() + "/Files/Arff/newemotest0.arff");
+					weka.start();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				btnStop.setText("Stop");
 				//guiStat.notifyAll();
 			}
 		});
@@ -197,37 +239,43 @@ public class App extends JFrame {
 		});
 		contentPane.add(btnTest, "cell 0 0");
 	}
-	
-	void SwingController(){
+
+	void swingController(){
 		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
 
 			@Override
 			protected Void doInBackground() throws Exception {
 				// TODO Auto-generated method stub
+				
 				while(guiStat == guiState.Record){
 					recorder.record();
 					emoDialog.start();
+					
 					Thread t = new Thread(new Runnable(){
-
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
-							while(recorder.getFilename().size() != 0){
-								matlab.setPath(currentRelativePath.toAbsolutePath().toString() +"/Files/Record/" + recorder.getFilename().get(0));
-								recorder.getFilename().remove(0);
-								try {
-									matlab.runMatlab();
-								} catch (MatlabConnectionException | MatlabInvocationException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+							if(matlabStat == matlabState.Stopped){
+								matlabStat = matlabState.Running;
+								System.out.println("start matlab " + recorder.getFilename().get(0));
+								while(recorder.getFilename().size() != 0){
+									matlab.setPath(currentRelativePath.toAbsolutePath().toString() +"/Files/Record/" + recorder.getFilename().get(0));
+
+									try {
+										matlab.runMatlab();
+									} catch (MatlabConnectionException | MatlabInvocationException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									System.out.println("done matlab " + recorder.getFilename().get(0));
+									recorder.getFilename().remove(0);
+									matlabStat = matlabState.Stopped;
 								}
-								System.out.println("done matlab");
 							}
 						}
 
 					});
 					t.start();
-					
 				}
 				return (Void) null;
 			}

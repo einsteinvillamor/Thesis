@@ -2,19 +2,25 @@ package prototypeFinal;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class CsvFileWriter {
 	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
-	private String path = "C:/Users/Eihwaz/Desktop/CSV/";
+	
 	private String filename;
 	private List<String> emotionList;
 	int c =0;
 	private static final String FILE_HEADER = "hfd,katz,hurst,box,dfa";
+	Path currentRelativePath = Paths.get("");
+	private String path = currentRelativePath.toAbsolutePath().toString() + "/Files/Csv/";
+			//"C:/Users/Eihwaz/Desktop/CSV/";
 	//private static final String FILE_HEADER_NO_EMO = "hfd,katz,hurst,box,dfa";
 	private double[] values;// = new double[34];
 	
@@ -30,7 +36,8 @@ public class CsvFileWriter {
 	
 	public void reader(String cpath) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(cpath));
-		BufferedWriter bw = new BufferedWriter(new FileWriter("C:/Users/Eihwaz/Desktop/ArffFile/newemotest0.arff"));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(currentRelativePath.toAbsolutePath().toString() + "/Files/Arff/newemotest0.arff"));
+		//"C:/Users/Eihwaz/Desktop/ArffFile/newemotest0.arff"));
 		String strLine, tmp;
 		int n = 0;
 		int count = 0;
@@ -62,6 +69,10 @@ public class CsvFileWriter {
 //		for(int i = 0; i < 30; i++){
 //			values[i] = i;
 //		}
+		File f = new File(path + filename);
+		if(f.delete()){
+			System.out.println("file deleted");
+		}
 		
 		FileWriter fileWriter = null;
 		

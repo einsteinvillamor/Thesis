@@ -41,7 +41,7 @@ public class AudioRecorder {
             public void run(){
                 AudioInputStream audioStream = new AudioInputStream(targetLine);
                 File audioFile = new File(filePath+"record"+fileInstance+".wav");
-                filename.add("record"+fileInstance+".wav");
+                
                 try {
                     AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE,audioFile);
                 } catch (IOException e) {
@@ -54,6 +54,7 @@ public class AudioRecorder {
         	System.out.println("recording" + fileInstance);
         	Thread.sleep(4000);
         	System.out.println("done record" +fileInstance);
+        	filename.add("record"+fileInstance+".wav");
         	fileInstance++;
         }
         targetLine.stop();

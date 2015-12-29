@@ -6,14 +6,28 @@ import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class TestApp {
 
 	public static void main(String[] args) throws UnknownHostException {
 		// TODO Auto-generated method stub
-		EmotionDialog dialog = new EmotionDialog();
-		dialog.start();
+//		EmotionDialog dialog = new EmotionDialog();
+//		dialog.start();
+		List<String> s = new ArrayList<>();
+		s.add("happy");
+		s.add("sad");
+		s.add("fear");
+		s.add("angry");
+		List<String> n = s;
+		String a="";
+		for(String i:n){
+			a += i+ ",";
+		}
+		a= a.substring(0, a.length() -1);
+		System.out.println(a);
 	}
 	
 	void test() throws UnknownHostException{
