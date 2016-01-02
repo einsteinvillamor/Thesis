@@ -47,11 +47,11 @@ public class App extends JFrame {
 	private CsvFileWriter cfw;
 	private CsvToArff ctoa;
 	private ArffWriter arff;
-	JButton btnTest = new JButton("Test");
 	JLabel lblLastRecordedEmotion = new JLabel("Last Recorded Emotion: ");
 	public static volatile JLabel lblTimer = new JLabel("Timer:");
 	String[] column = {"Time Length", "Agent Assessment", "Detected Emotion"};
 	
+	private List<String> txtList = new ArrayList<>();
 	
 	JLabel lblCorrectlyClassified = new JLabel("Correctly Classified: ");
 	JLabel lblIncorrectlyClassified = new JLabel("Incorrectly Classified: ");
@@ -74,7 +74,7 @@ public class App extends JFrame {
 	}
 	public static volatile matlabState matlabStat = matlabState.Stopped;
 	public static volatile guiState guiStat = guiState.Stop;
-	public static volatile double time = 0;
+	public static volatile int time = 0;
 	
 	JButton btnStop = new JButton("Stop");
 	
@@ -196,8 +196,10 @@ public class App extends JFrame {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							// TODO Auto-generated method stub
-							SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-							lblTimer.setText("Timer: " + sdf.format(new java.util.Date()));
+							//SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+							//lblTimer.setText("Timer: " + sdf.format(new java.util.Date()));
+							time++;
+							lblTimer.setText("Timer: " + timeTransfer(time));
 						}
 					});
 					timer.start();
@@ -259,6 +261,7 @@ public class App extends JFrame {
 					weka.setFilepath(currentRelativePath.toAbsolutePath().toString() + "/Files/Arff/newemotest0.arff");
 					weka.start();
 					populateTable();
+					cfw.writeTextFile(txtList);
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -269,14 +272,6 @@ public class App extends JFrame {
 			}
 		});
 		contentPane.add(btnStop, "cell 0 4");
-		
-		
-		btnTest.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		contentPane.add(btnTest, "cell 0 0");
 
 		contentPane.add(lblCorrectlyClassified, "cell 0 2");
 		
@@ -292,7 +287,7 @@ public class App extends JFrame {
 			data[1] = emoDialog.getEmotionList().get(i);
 			data[2] = weka.getEmotionList().get(i);			
 			dtm.addRow(data);
-			//asd.add("Time length" + recorder.getTimeline().get(i)+"Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Prediction: "+weka.getEmotionList().get(i+2));
+			txtList.add("Time length: " + recorder.getTimeline().get(i)+"Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Predicted "+weka.getEmotionList().get(i+2) +" ");
 			//System.out.println(asd.get(i));
 		}
 
@@ -355,5 +350,17 @@ public class App extends JFrame {
 		worker.execute();
 	}
 
+	String timeTransfer(int counter){
+		
+		final int MINUTES_IN_AN_HOUR = 60;
+		final int SECONDS_IN_A_MINUTE = 60;
+		
+		int seconds = counter % SECONDS_IN_A_MINUTE;
+		int totalMinutes = counter/ SECONDS_IN_A_MINUTE;
+		int minutes = totalMinutes % MINUTES_IN_AN_HOUR;
+		int hours = totalMinutes/ MINUTES_IN_AN_HOUR;
+		
+		return hours + ":" + minutes + ":" + seconds;
+	}
 	
 }

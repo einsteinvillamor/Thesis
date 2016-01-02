@@ -34,6 +34,15 @@ public class CsvFileWriter {
 //		}
 	}
 	
+	public void writeTextFile(List<String> list) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(currentRelativePath.toAbsolutePath().toString() + "/Files/FinalResult/finalres.txt"));
+		for(String i:list){
+			bw.write(i);
+			bw.append(System.lineSeparator());
+		}
+		bw.close();
+	}
+	
 	public void reader(String cpath) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(cpath));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(currentRelativePath.toAbsolutePath().toString() + "/Files/Arff/newemotest0.arff"));
