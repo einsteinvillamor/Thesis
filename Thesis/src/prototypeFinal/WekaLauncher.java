@@ -21,7 +21,7 @@ public class WekaLauncher {
 	private String filename;
 	private List<String> acc = new ArrayList<>();
 	private List<String> emotionList = new ArrayList<>();
-	private String modelpath = "";//"C:/Users/Eihwaz/Downloads/KNN.model";
+	private String modelpath = ""; //"C:/Users/Adache/Documents/git/Thesis/PermanentFiles/Model/J48.model";//"C:/Users/Eihwaz/Downloads/KNN.model";
 	private Classifier cls;
 	Path currentRelativePath = Paths.get("");
 //	public WekaLauncher() throws Exception{

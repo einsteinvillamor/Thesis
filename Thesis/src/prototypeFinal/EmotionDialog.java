@@ -30,6 +30,9 @@ public class EmotionDialog
 	JRadioButton rdbtnAngry = new JRadioButton("Angry");
 	JRadioButton rdbtnDisgust = new JRadioButton("Disgust");
 	
+	
+	JButton btnStop;
+	
 	ButtonGroup group = new ButtonGroup();
 	JButton btn = new JButton("OK");
 	
@@ -41,6 +44,7 @@ public class EmotionDialog
 
 	public void start(){
 		if(App.guiStat == guiState.Record){
+			btnStop.setEnabled(false);
 			setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			setVisible(true);
 			emoChecker(emotionLabel);
@@ -93,6 +97,7 @@ public class EmotionDialog
 					emotionString = "disgust";
 					emotionSelected();
 				}
+				btnStop.setEnabled(true);
 			}
 			
 		});
@@ -150,6 +155,10 @@ public class EmotionDialog
 	
 	public void setEmotionLabel(List<String> list){
 		this.emotionLabel = list;
+	}
+	
+	public void setBtnStop(JButton btn){
+		btnStop = btn;
 	}
 
 }

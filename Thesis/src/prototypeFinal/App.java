@@ -68,6 +68,8 @@ public class App extends JFrame {
 	public static volatile matlabState matlabStat = matlabState.Stopped;
 	public static volatile guiState guiStat = guiState.Stop;
 	
+	JButton btnStop = new JButton("Stop");
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -153,6 +155,12 @@ public class App extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				dialog.openDialogBox();
 				weka.setModelpath(dialog.getNamePath().toString());
+				try {
+					weka.LoadModel();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println(dialog.getNamePath());
 				btnLoadModel.setText("Model Loaded");
 				isModelSet = true;
@@ -179,6 +187,7 @@ public class App extends JFrame {
 					
 					btnLoadModel.setEnabled(false);
 					btnSetLabel.setEnabled(false);
+					emoDialog.setBtnStop(btnStop);
 					emoDialog.setLblRecord(lblLastRecordedEmotion);
 					//guiStat.notifyAll();
 
@@ -199,7 +208,7 @@ public class App extends JFrame {
 		contentPane.add(lblLastRecordedEmotion, "cell 0 2");
 		contentPane.add(btnRecord, "flowx,cell 0 3");
 			
-		JButton btnStop = new JButton("Stop");
+		
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnRecord.setText("Record");
@@ -276,16 +285,22 @@ public class App extends JFrame {
 				
 				while(guiStat == guiState.Record){
 					recorder.record();
+					
 					emoDialog.start();
+					
+					if(guiStat == guiState.Stop){
+						recorder.getFilename().remove(recorder.getFilename().size());
+					}
 					
 					Thread t = new Thread(new Runnable(){
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
 							if(matlabStat == matlabState.Stopped){
-								matlabStat = matlabState.Running;
-								System.out.println("start matlab " + recorder.getFilename().get(0));
+
 								while(recorder.getFilename().size() != 0){
+									matlabStat = matlabState.Running;
+									System.out.println("start matlab " + recorder.getFilename().get(0));
 									matlab.setPath(currentRelativePath.toAbsolutePath().toString() +"/Files/Record/" + recorder.getFilename().get(0));
 
 									try {
