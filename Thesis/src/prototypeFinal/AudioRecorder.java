@@ -52,7 +52,7 @@ public class AudioRecorder {
         };
         if(App.guiStat == guiState.Record){
         	//timeline.add(App.lblTimer.getText().substring(7, 15));
-        	timeline.add(App.lblTimer.getText().substring(7, 12));
+        	timeline.add(App.lblTimer.getText().substring(7, App.lblTimer.getText().length()) +" - " + App.timeTransfer(App.time + 3));
         	thread.start();
         	System.out.println("recording" + fileInstance);
         	Thread.sleep(4000);

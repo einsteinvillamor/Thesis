@@ -280,14 +280,14 @@ public class App extends JFrame {
 	}
 	
 	void populateTable(){
-		DefaultTableModel dtm = new DefaultTableModel(new Object[] {"Time Length", "Agent Assessment", "Detected Emotion"},0);//asd.toArray(new Object[][] {}), column);
+		DefaultTableModel dtm = new DefaultTableModel(new Object[] {"Time Length", " Agent Assessment", "Detected Emotion"},0);//asd.toArray(new Object[][] {}), column);
 		for(int i = 0 ; i < emoDialog.getEmotionList().size(); i++ ){//emoDialog.getEmotionList().size();i++){
 			String[] data  = new String[3];
 			data[0] = recorder.getTimeline().get(i);
 			data[1] = emoDialog.getEmotionList().get(i);
 			data[2] = weka.getEmotionList().get(i);			
 			dtm.addRow(data);
-			txtList.add("Time length: " + recorder.getTimeline().get(i)+"Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Predicted "+weka.getEmotionList().get(i+2) +" ");
+			txtList.add("Time length: " + recorder.getTimeline().get(i)+" Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Predicted "+weka.getEmotionList().get(i+2) +" ");
 			//System.out.println(asd.get(i));
 		}
 
@@ -350,7 +350,7 @@ public class App extends JFrame {
 		worker.execute();
 	}
 
-	String timeTransfer(int counter){
+	public static String timeTransfer(int counter){
 		
 		final int MINUTES_IN_AN_HOUR = 60;
 		final int SECONDS_IN_A_MINUTE = 60;
