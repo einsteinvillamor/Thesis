@@ -24,6 +24,7 @@ public class AudioRecorder {
     private boolean isRunning = false;
     private int fileInstance = 0;
     private List<String> filename = new ArrayList<>();
+    private List<String> timeline = new ArrayList<>();
     final AudioFormat audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
 
     public void record() 
@@ -50,6 +51,7 @@ public class AudioRecorder {
             }
         };
         if(App.guiStat == guiState.Record){
+        	timeline.add(App.lblTimer.getText().substring(7, 15));
         	thread.start();
         	System.out.println("recording" + fileInstance);
         	Thread.sleep(4000);
@@ -80,4 +82,12 @@ public class AudioRecorder {
     public void setRunning(boolean running) {
         isRunning = running;
     }
+
+	public List<String> getTimeline() {
+		return timeline;
+	}
+
+	public void setTimeline(List<String> timeline) {
+		this.timeline = timeline;
+	}
 }

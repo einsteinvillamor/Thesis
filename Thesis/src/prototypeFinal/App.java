@@ -25,11 +25,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.JLabel;
 
 public class App extends JFrame {
@@ -45,9 +47,14 @@ public class App extends JFrame {
 	private CsvFileWriter cfw;
 	private CsvToArff ctoa;
 	private ArffWriter arff;
+	JButton btnTest = new JButton("Test");
 	JLabel lblLastRecordedEmotion = new JLabel("Last Recorded Emotion: ");
-	
+	public static volatile JLabel lblTimer = new JLabel("Timer:");
 	String[] column = {"Time Length", "Agent Assessment", "Detected Emotion"};
+	
+	
+	JLabel lblCorrectlyClassified = new JLabel("Correctly Classified: ");
+	JLabel lblIncorrectlyClassified = new JLabel("Incorrectly Classified: ");
 	
 	public static boolean isLabelSet = false;
 	public static boolean isModelSet = false;
@@ -67,6 +74,7 @@ public class App extends JFrame {
 	}
 	public static volatile matlabState matlabStat = matlabState.Stopped;
 	public static volatile guiState guiStat = guiState.Stop;
+	public static volatile double time = 0;
 	
 	JButton btnStop = new JButton("Stop");
 	
@@ -76,6 +84,7 @@ public class App extends JFrame {
 				try {
 					App frame = new App();
 					frame.setVisible(true);
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -144,10 +153,10 @@ public class App extends JFrame {
 		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 370);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new MigLayout("", "[grow]", "[][grow][][]"));
+		contentPane.setLayout(new MigLayout("", "[grow]", "[][grow][][][]"));
 		setContentPane(contentPane);
 		
 		JButton btnLoadModel = new JButton("Load Model");
@@ -181,6 +190,18 @@ public class App extends JFrame {
 		btnRecord.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isModelSet == true && isLabelSet == true){
+					
+					Timer timer = new Timer(1000,new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+							lblTimer.setText("Timer: " + sdf.format(new java.util.Date()));
+						}
+					});
+					timer.start();
+					
 					btnRecord.setText("Recording");
 					guiStat = guiState.Record;
 					emoDialog.setEmotionLabel(LabelDialog.labelList);
@@ -205,8 +226,11 @@ public class App extends JFrame {
 		contentPane.add(scrollPane, "cell 0 1,grow");
 		
 		
-		contentPane.add(lblLastRecordedEmotion, "cell 0 2");
-		contentPane.add(btnRecord, "flowx,cell 0 3");
+		contentPane.add(lblLastRecordedEmotion, "flowx,cell 0 2");
+		
+		
+		contentPane.add(lblTimer, "flowx,cell 0 3");
+		contentPane.add(btnRecord, "flowx,cell 0 4");
 			
 		
 		btnStop.addActionListener(new ActionListener() {
@@ -234,6 +258,7 @@ public class App extends JFrame {
 					cfw.reader(arff.getFilepath());
 					weka.setFilepath(currentRelativePath.toAbsolutePath().toString() + "/Files/Arff/newemotest0.arff");
 					weka.start();
+					populateTable();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -243,34 +268,38 @@ public class App extends JFrame {
 				//guiStat.notifyAll();
 			}
 		});
-		contentPane.add(btnStop, "cell 0 3");
+		contentPane.add(btnStop, "cell 0 4");
 		
-		JButton btnTest = new JButton("Test");
+		
 		btnTest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-					
 			}
 		});
 		contentPane.add(btnTest, "cell 0 0");
+
+		contentPane.add(lblCorrectlyClassified, "cell 0 2");
+		
+		
+		contentPane.add(lblIncorrectlyClassified, "cell 0 3");
 	}
 	
 	void populateTable(){
-		List<String> asd = new ArrayList<>();
-		TableModel dtm = new DefaultTableModel(asd.toArray(new Object[][] {}), column);
-		for(int i = 0 ; i < emoDialog.getEmotionList().size();i++){
-			asd.add("Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Prediction: "+weka.getEmotionList().get(i+2));
-			System.out.println(asd.get(i));
+		DefaultTableModel dtm = new DefaultTableModel(new Object[] {"Time Length", "Agent Assessment", "Detected Emotion"},0);//asd.toArray(new Object[][] {}), column);
+		for(int i = 0 ; i < emoDialog.getEmotionList().size(); i++ ){//emoDialog.getEmotionList().size();i++){
+			String[] data  = new String[3];
+			data[0] = recorder.getTimeline().get(i);
+			data[1] = emoDialog.getEmotionList().get(i);
+			data[2] = weka.getEmotionList().get(i);			
+			dtm.addRow(data);
+			//asd.add("Time length" + recorder.getTimeline().get(i)+"Agent Assessment: " + emoDialog.getEmotionList().get(i)+" Prediction: "+weka.getEmotionList().get(i+2));
+			//System.out.println(asd.get(i));
 		}
 
-//		for(int i = 0; i < asd.size(); i++){
-//			System.out.println("hello");
-//			dtm.addElement(asd.get(i));
-//		}
 		table.setModel(dtm);
 		
-		//label.setText(weka.getAcc().get(1));
-		//label_1.setText(weka.getAcc().get(2));
+		lblCorrectlyClassified.setText(weka.getAcc().get(1));
+		lblIncorrectlyClassified.setText(weka.getAcc().get(2));
 		for(String i: weka.getAcc()){
 			System.out.println(i);
 		}
