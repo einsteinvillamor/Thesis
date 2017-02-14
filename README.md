@@ -18,4 +18,9 @@ This program captures audio and can recognize emotion in it.
 -weka jar file    
 
 #Developer
-- Einstein Villamor (einsteinvillamor@gmail.com)
+- Einstein Villamor (einsteinvillamor@gmail.com)    
+
+#Members
+- Einstein Villamor   
+- Iris Dizon    
+- Joshua Orga   
