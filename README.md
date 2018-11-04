@@ -17,8 +17,11 @@ This program captures audio and can recognize emotion in it.
 -matlabcontrol-4.1.0 jar file   
 -weka jar file    
 
-# Developer
-- Einstein Villamor (einsteinvillamor@gmail.com)    
+# Lead Developer
+- Einstein Villamor (steinvillamor@gmail.com)
+
+# Lead Researcher
+- Einstein Villamor (steinvillamor@gmail.com)
 
 # Members
 - Einstein Villamor   
